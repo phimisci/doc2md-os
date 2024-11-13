@@ -1,3 +1,4 @@
 files/
 __pycache__/
 .mypy_cache/
+_docs/
