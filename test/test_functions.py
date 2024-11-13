@@ -1,8 +1,13 @@
+'''
+This module contains several tests for the functions in the `markdown_cleaner.py` module.
+'''
+
 import unittest
 from markdown_cleaner import remove_escapes, replace_comma_citation, remove_yaml_bib
 
 class TestRemoveEscapes(unittest.TestCase):
     def test_remove_escapes(self):
+        '''Test cases for the remove_escapes function.'''
         # Test case 1: No escapes to remove
         md_file = "This is a test"
         expected_output = "This is a test"
@@ -29,6 +34,7 @@ class TestRemoveEscapes(unittest.TestCase):
         self.assertEqual(remove_escapes(md_file), expected_output)
 
     def test_replace_comma_citation(self):
+        '''Test cases for the replace_comma_citation function.'''
         # Test case 1: Replace comma in citeproc citation with semicolon
         md_file = "[@mueller21, @peter23]"
         expected_output = "[@mueller21; @peter23]"
@@ -56,6 +62,7 @@ class TestRemoveEscapes(unittest.TestCase):
 
 class TestRemoveYamlBib(unittest.TestCase):
     def test_remove_yaml_bib(self):
+        '''Test cases for the remove_yaml_bib function.'''
         # Test case 1: Remove YAML front matter and bibliography in --- ... block
         md_file_path = "test/test_file.md"
         expected_output = "\n# Introduction\n\nThis is the content of the Markdown file."

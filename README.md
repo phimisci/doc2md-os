@@ -1,23 +1,37 @@
-# DOC2MD
+# Introduction
+DOC2MD is a CLI tool that allows for the conversion of DOCX files to Markdown. The tool is specifically designed to handle DOCX files that contain citations and references, but ODT files are supported as well. The tool uses Pandoc to convert the DOCX files to Markdown and then cleans the Markdown files to ensure that they are ready for publication. The software was initially developed to support the typesetting of articles in the [Philosophy and the Mind Sciences](https://philosophymindscience.org/) journal.
 
-## Description
+# Installation
+The tool is available as a Docker image. To use the tool, you need to have [Docker](https://docs.docker.com/engine/install/) installed on your system. You can either pull the image from the GitHub Container Registry or build the image yourself.
 
-Transforming PhiMiSci submissions (.docx) to (clean) Markdown using Pandoc. The output also includes a doc2md.log file with the Pandoc output (if any problems occur during the conversion).
+## Pull the image from the GitHub Container Registry
+You can directly pull the image from the GitHub Container Registry by running the following command:
 
-1. DOCX -> Raw MD (pandoc)
-2. Cleaning MD
-3. Output
+`docker pull ghcr.io/phimisci/doc2md:latest`
 
-## Usage
+## Build the image yourself
+If you want to build the image yourself, you can do so by cloning the repository and running the following command in the root directory of the repository:
 
-### docx/odt files with citeproc citations and external BibTeX file
-`docker run --rm --volume "$(pwd):/app/files" --user $(id -u):$(id -g) registry.git.noc.ruhr-uni-bochum.de/phimisci/doc2md/0.0.1:latest <FILENAME>.<docx|odt>`
+`docker build --tag doc2md .`
 
-### docx files with included citations (e.g. using the Zotero plugin for Word)
-`docker run --rm --volume "$(pwd):/app/files" --user $(id -u):$(id -g) registry.git.noc.ruhr-uni-bochum.de/phimisci/doc2md/0.0.1:latest --zotero <FILENAME>.docx`
+# Usage
+In the following steps, we assume that you have installed the Docker image as described above using the local build. If you have pulled the image from the GitHub Container Registry, you need to replace `doc2md` with the appropriate image name (which is `ghcr.io/phimisci/doc2md:latest`).
 
-## Versions
+## DOCX/ODT files with citeproc citations and external BibTeX file
+If you want to convert a DOCX/ODT file to Markdown and you have included citations in the DOCX file that use [pandoc's citeproc](https://pandoc.org/MANUAL.html#citation-syntax) citation style, you can use the following command:
 
-### 0.1.0
+`docker run --rm --volume "$(pwd):/app/files" doc2md <FILENAME>.<docx|odt>`
 
-- Bump Pandoc to 3.4.0.0; this allows for better handling of citations and references when using Zotero plugins in Word
+## DOCX files with included citations (e.g. using the Zotero plugin for Word)
+If you want to convert a DOCX file to Markdown and you have included citations in the DOCX file using the Zotero plugin for Word, you can use the following command:
+
+`docker run --rm --volume "$(pwd):/app/files" doc2md --zotero <FILENAME>.docx`
+
+# About
+The tool was developed by Thomas Jurczyk for [Philosophy and the Mind Sciences](https://philosophymindscience.org/) to support the typesetting of articles in the journal. The tool is open-source and licensed under the MIT license. The source code is available on [GitHub]().
+
+# Versions
+
+### 1.0.0
+
+- Initial release

@@ -1,0 +1,212 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>test.test_functions &mdash; DOC2MD 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            DOC2MD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../source/installation.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source/modules.html">Docs</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">DOC2MD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">test.test_functions</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for test.test_functions</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">This module contains several tests for the functions in the `markdown_cleaner.py` module.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">unittest</span>
+<span class="kn">from</span> <span class="nn">markdown_cleaner</span> <span class="kn">import</span> <span class="n">remove_escapes</span><span class="p">,</span> <span class="n">replace_comma_citation</span><span class="p">,</span> <span class="n">remove_yaml_bib</span>
+
+<div class="viewcode-block" id="TestRemoveEscapes">
+<a class="viewcode-back" href="../../source/test.html#test.test_functions.TestRemoveEscapes">[docs]</a>
+<span class="k">class</span> <span class="nc">TestRemoveEscapes</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRemoveEscapes.test_remove_escapes">
+<a class="viewcode-back" href="../../source/test.html#test.test_functions.TestRemoveEscapes.test_remove_escapes">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_remove_escapes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Test cases for the remove_escapes function.&#39;&#39;&#39;</span>
+        <span class="c1"># Test case 1: No escapes to remove</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="s2">&quot;This is a test&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;This is a test&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">remove_escapes</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span>
+
+        <span class="c1"># Test case 2: Remove escapes for special characters</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;This is a \[test\] with \#special\# characters&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;This is a [test] with #special# characters&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">remove_escapes</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span>
+
+        <span class="c1"># Test case 3: Remove multiple escapes in one step</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;This is a \[test\] with \#special\# characters and </span><span class="se">\\</span><span class="s2">backslashes</span><span class="se">\\</span><span class="s2">&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;This is a [test] with #special# characters and </span><span class="se">\\</span><span class="s2">backslashes</span><span class="se">\\</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">remove_escapes</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span>
+
+        <span class="c1"># Test case 4: Remove escapes for quotes</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;This is a \&quot;test\&quot; with </span><span class="se">\&#39;</span><span class="s1">quotes</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s1">&#39;This is a &quot;test&quot; with </span><span class="se">\&#39;</span><span class="s1">quotes</span><span class="se">\&#39;</span><span class="s1">&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">remove_escapes</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span>
+
+        <span class="c1"># Test case 5: Remove escapes for brackets</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;This is a $\rbracktest$\lbrack with brackets&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;This is a ]test[ with brackets&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">remove_escapes</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TestRemoveEscapes.test_replace_comma_citation">
+<a class="viewcode-back" href="../../source/test.html#test.test_functions.TestRemoveEscapes.test_replace_comma_citation">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_replace_comma_citation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Test cases for the replace_comma_citation function.&#39;&#39;&#39;</span>
+        <span class="c1"># Test case 1: Replace comma in citeproc citation with semicolon</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21, @peter23]&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21; @peter23]&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">replace_comma_citation</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span>
+
+        <span class="c1"># Test case 2: No comma in citeproc citation</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21]&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21]&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">replace_comma_citation</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span>
+
+        <span class="c1"># Test case 3: Multiple citations with comma</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21, @peter23, @john45]&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21; @peter23; @john45]&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">replace_comma_citation</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span>
+        
+        <span class="c1"># Test case 4: Multiple citations with comma and page numbers</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21, @peter23, @john45, 23-45]&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21; @peter23; @john45, 23-45]&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">replace_comma_citation</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span>
+
+        <span class="c1"># Test case 5: Multiple citations with comma and page numbers</span>
+        <span class="n">md_file</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21, @peter23, 33-55, @john45, 23-45, 46-78]&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;[@mueller21; @peter23, 33-55; @john45, 23-45, 46-78]&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">replace_comma_citation</span><span class="p">(</span><span class="n">md_file</span><span class="p">),</span> <span class="n">expected_output</span><span class="p">)</span></div>
+</div>
+
+
+<div class="viewcode-block" id="TestRemoveYamlBib">
+<a class="viewcode-back" href="../../source/test.html#test.test_functions.TestRemoveYamlBib">[docs]</a>
+<span class="k">class</span> <span class="nc">TestRemoveYamlBib</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">TestCase</span><span class="p">):</span>
+<div class="viewcode-block" id="TestRemoveYamlBib.test_remove_yaml_bib">
+<a class="viewcode-back" href="../../source/test.html#test.test_functions.TestRemoveYamlBib.test_remove_yaml_bib">[docs]</a>
+    <span class="k">def</span> <span class="nf">test_remove_yaml_bib</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Test cases for the remove_yaml_bib function.&#39;&#39;&#39;</span>
+        <span class="c1"># Test case 1: Remove YAML front matter and bibliography in --- ... block</span>
+        <span class="n">md_file_path</span> <span class="o">=</span> <span class="s2">&quot;test/test_file.md&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"># Introduction</span><span class="se">\n\n</span><span class="s2">This is the content of the Markdown file.&quot;</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">md_file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;---</span><span class="se">\n</span><span class="s2">Title: Test File</span><span class="se">\n</span><span class="s2">Author: John Doe</span><span class="se">\n</span><span class="s2">...</span><span class="se">\n\n</span><span class="s2"># Introduction</span><span class="se">\n\n</span><span class="s2">This is the content of the Markdown file.&quot;</span><span class="p">)</span>
+        
+        <span class="n">remove_yaml_bib</span><span class="p">(</span><span class="n">md_file_path</span><span class="p">)</span>
+        
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">md_file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">actual_output</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">actual_output</span><span class="p">,</span> <span class="n">expected_output</span><span class="p">)</span>
+
+        <span class="c1"># Test case 2: Remove YAML front matter and bibliography in --- --- block</span>
+        <span class="n">md_file_path</span> <span class="o">=</span> <span class="s2">&quot;test/test_file.md&quot;</span>
+        <span class="n">expected_output</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2"># Introduction</span><span class="se">\n\n</span><span class="s2">This is the content of the Markdown file.&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">md_file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;---</span><span class="se">\n</span><span class="s2">Title: Test File</span><span class="se">\n</span><span class="s2">Author: John Doe</span><span class="se">\n</span><span class="s2">---</span><span class="se">\n\n</span><span class="s2"># Introduction</span><span class="se">\n\n</span><span class="s2">This is the content of the Markdown file.&quot;</span><span class="p">)</span>
+
+        <span class="n">remove_yaml_bib</span><span class="p">(</span><span class="n">md_file_path</span><span class="p">)</span>
+          
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">md_file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">actual_output</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">actual_output</span><span class="p">,</span> <span class="n">expected_output</span><span class="p">)</span></div>
+</div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Thomas Jurczyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
