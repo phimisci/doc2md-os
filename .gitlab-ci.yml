@@ -1,0 +1,16 @@
+stages:
+  - deploy
+
+publish_to_container_registry:
+  stage: deploy
+  image: docker:stable
+  services:
+    - docker:dind
+  variables:
+    IMAGE: $CI_REGISTRY/phimisci/doc2md/0.1.0:latest
+  script:
+    - docker login -u phimisci-doc2md-token -p $DEPLOY_TOKEN $CI_REGISTRY
+    - docker build -t $IMAGE .
+    - docker push $IMAGE
+  only:
+    - main
