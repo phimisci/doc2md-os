@@ -1,0 +1,23 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Log in to GitHub Container Registry
+      run: echo "${{ secrets.PHIMISCI_DOC2MD_OS_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+      
+    - name: Build Docker image
+      run: docker build -t ghcr.io/${{ github.repository }}:latest .
+      
+    - name: Push Docker image
+      run: docker push ghcr.io/${{ github.repository }}:latest
