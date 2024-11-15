@@ -9,7 +9,7 @@ The tool is available as a Docker image. To use the tool, you need to have [Dock
 ### Pull the image from the GitHub Container Registry
 You can directly pull the image from the GitHub Container Registry by running the following command:
 
-`docker pull ghcr.io/phimisci/doc2md:latest`
+`docker pull ghcr.io/phimisci/doc2md-os:latest`
 
 ### Build the image yourself
 If you want to build the image yourself, you can do so by cloning the repository and running the following command in the root directory of the repository:
@@ -17,7 +17,7 @@ If you want to build the image yourself, you can do so by cloning the repository
 `docker build --tag doc2md .`
 
 ## Usage
-In the following steps, we assume that you have installed the Docker image as described above using the local build. If you have pulled the image from the GitHub Container Registry, you need to replace `doc2md` with the appropriate image name (which is `ghcr.io/phimisci/doc2md:latest`).
+In the following steps, we assume that you have installed the Docker image as described above using the local build. If you have pulled the image from the GitHub Container Registry, you need to replace `doc2md` with the appropriate image name (which is `ghcr.io/phimisci/doc2md-os:latest`).
 
 ### DOCX/ODT files with citeproc citations and external BibTeX file
 If you want to convert a DOCX/ODT file to Markdown and you have included citations in the DOCX file that use [pandoc's citeproc](https://pandoc.org/MANUAL.html#citation-syntax) citation style, you can use the following command:
