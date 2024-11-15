@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Copy files
-COPY markdown_cleaner /app/markdown_cleaner
+COPY markdown_cleaner.py /app/markdown_cleaner.py
 COPY doc2md.py /app/doc2md.py
 COPY requirements.txt /app/requirements.txt
 
