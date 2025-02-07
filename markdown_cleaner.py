@@ -4,6 +4,7 @@ This module contains functions to clean markdown files using regular expressions
 
 import re
 
+
 def remove_escapes(md_file: str) -> str:
     '''Function to remove unnecessary escapes resulting from DOCX->MD conversion.
 
@@ -28,14 +29,16 @@ def remove_escapes(md_file: str) -> str:
     md_file = md_file.replace(r"\^", r"^")
     md_file = md_file.replace(r'\"', r'"')
     md_file = md_file.replace(r"\'", r"'")
+    md_file = md_file.replace(r"\--", r"--")
     md_file = md_file.replace(r"$\rbrack", r"]")
     md_file = md_file.replace(r"$\lbrack", r"[")
 
     return md_file
 
+
 def replace_comma_citation(md_file: str) -> str:
     '''Function to replace comma in citeproc citation with semicolon: [@mueller21, @peter23] -> [@mueller21; @peter23]
-        
+
         Parameters
         ----------
             md_file: str
@@ -48,8 +51,9 @@ def replace_comma_citation(md_file: str) -> str:
     '''
     pattern = re.compile(r"(@\w+\s?|@\w+\s?,\s?\d+-\d+\s?),\s?(?=@\w+)", re.UNICODE)
     md_file = re.sub(pattern, r"\1; ", md_file)
-    
+
     return md_file
+
 
 def remove_yaml_bib(md_file_path: str) -> None:
     """Removes YAML front matter and bibliography from a Markdown file.
@@ -69,10 +73,10 @@ def remove_yaml_bib(md_file_path: str) -> None:
     # Read the Markdown file
     with open(md_file_path, "r", encoding="utf-8") as f:
         md_file = f.read()
-    
+
     # Remove YAML front matter and bibliography
     md_file = re.sub(pattern, "", md_file)
-    
+
     # Save the cleaned Markdown file
     with open(md_file_path, "w", encoding="utf-8") as f:
         f.write(md_file)
