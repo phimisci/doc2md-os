@@ -1,4 +1,4 @@
-FROM pandoc/core:3.4.0.0-ubuntu
+FROM pandoc/core:3.6.4.0-ubuntu
 
 RUN apt-get update && apt-get install -y \
         python3 \

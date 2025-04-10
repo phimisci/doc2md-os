@@ -33,6 +33,8 @@ If you want to convert a DOCX file to Markdown and you have included citations i
 The tool was developed by Thomas Jurczyk for [Philosophy and the Mind Sciences](https://philosophymindscience.org/) to support the typesetting of articles in the journal. The tool is open-source and licensed under the MIT license. The source code is available on [GitHub](https://github.com/phimisci/doc2md-os).
 
 ## Versions
+### 1.0.1
+- Bump Pandoc version to 3.6.4.0
 
 ### 1.0.0
 
