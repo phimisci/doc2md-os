@@ -160,8 +160,8 @@ def convert_doc_autobib_to_md(doc_file_path: str) -> None:
     """
     # Convert docx to markdown via pandoc
     pandoc_command = ["pandoc", "-s", doc_file_path,
-                      "--bibliography=", arguments.autobib,
-                      "--filter filter/hand-written-citations.py",
+                      "--bibliography", arguments.autobib,
+                      "--filter", "filter/hand-written-citations.py",
                       "-t", "markdown", "-o", "files/raw_markdown.md"]
     result = subprocess.run(
         pandoc_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
