@@ -29,6 +29,15 @@ def parse_arguments() -> argparse.Namespace:
                 files.""", 
         action="store_true")
     
+    parser.add_argument(
+        "--autobib",
+        type=str,
+        help="""Path to a bibliographical database. 
+                Toggles usage of filter for automatic parsing of handwritten 
+                citations, based on the supplied bibliography database.""",
+        action="store"
+    )
+    
     args = parser.parse_args()
 
     return args
@@ -136,6 +145,46 @@ def convert_doc_zotero_to_md(doc_file_path: str) -> None:
     with open("files/clean_markdown.md", "w", encoding="utf-8") as f:
         f.write(md_file)
 
+def convert_doc_autobib_to_md(doc_file_path: str) -> None:
+    """Convert a docx file to markdown using pandoc.
+
+        Parameters
+        ----------
+            doc_file_path: str
+                Path to the input docx file.
+
+        Returns
+        -------
+            None
+
+    """
+    # Convert docx to markdown via pandoc
+    pandoc_command = ["pandoc", "-s", doc_file_path,
+                      "--bibliography=", arguments.autobib,
+                      "--filter filter/hand-written-citations.py",
+                      "-t", "markdown", "-o", "files/raw_markdown.md"]
+    result = subprocess.run(
+        pandoc_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
+        text=True
+        )
+
+    # Check if the command was successful
+    if result.returncode == 0:
+        # Open raw markdown file
+        with open("files/raw_markdown.md", "r", encoding="utf-8") as f:
+            md_file = f.read()
+        # Clean markdown
+        md_file = remove_escapes(md_file)
+        md_file = replace_comma_citation(md_file)
+        # Save clean markdown
+        with open("files/clean_markdown.md", "w", encoding="utf-8") as f:
+            f.write(md_file)
+    else:
+        logging.error(
+            f"Error occurred when converting DOCX->MD: {result.stderr}")
+        print("Error running pandoc")
+        print("Error:", result.stderr)
+
 
 if __name__ == "__main__":
     # Parse command line arguments
@@ -155,7 +204,11 @@ if __name__ == "__main__":
         exit()
 
     # Check if docx file has been created using Zotero Plugin
-    if arguments.zotero:
-        convert_doc_zotero_to_md(doc_file_path)
-    else:
+    if not (arguments.zotero or arguments.autobib):
         convert_doc_to_md(doc_file_path)
+    else:
+        if arguments.zotero:
+            convert_doc_zotero_to_md(doc_file_path)
+        if arguments.autobib:
+            convert_doc_autobib_to_md(doc_file_path)
+        
