@@ -19,6 +19,9 @@ COPY hand-written-citations.py /app/hand-written-citations.py
 COPY doc2md.py /app/doc2md.py
 COPY requirements.txt /app/requirements.txt
 
+# Install python dependencies
+RUN pip3 install -r /app/requirements.txt
+
 # Create folder for file input/output
 RUN mkdir /app/files
 
