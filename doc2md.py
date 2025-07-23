@@ -160,12 +160,22 @@ def convert_doc_autobib_to_md(doc_file_path: str) -> None:
     """
     # Convert docx to markdown via pandoc
     pandoc_command = ["pandoc", "-s", doc_file_path,
-                      "--bibliography", arguments.autobib,
+                      "--bibliography", f"files/{arguments.autobib}",
                       "--filter", "filter/hand-written-citations.py",
                       "-t", "markdown", "-o", "files/raw_markdown.md"]
     result = subprocess.run(
         pandoc_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, 
         text=True
+        )
+    
+    # When autobib was successful, run a filter to detect remaining citation
+    # candidates that weren't detected through the autobib filter.
+    if result.returncode == 0:
+        subprocess.run(
+            ["pandoc", "files/raw_markdown.md", "--filter", 
+             "filter/find_citation_candidates.py", "-t", "markdown", 
+             "-o", "/dev/null"], 
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
         )
 
     # Check if the command was successful
@@ -178,7 +188,7 @@ def convert_doc_autobib_to_md(doc_file_path: str) -> None:
         md_file = replace_comma_citation(md_file)
         # Save clean markdown
         with open("files/clean_markdown.md", "w", encoding="utf-8") as f:
-            f.write(md_file)
+            f.write(md_file)            
     else:
         logging.error(
             f"Error occurred when converting DOCX->MD: {result.stderr}")
