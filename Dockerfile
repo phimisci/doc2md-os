@@ -11,6 +11,8 @@ WORKDIR /app
 
 # Copy files
 COPY markdown_cleaner.py /app/markdown_cleaner.py
+COPY find_citation_candidates.py /app/find_citation_candidates.py
+COPY hand-written-citations.py /app/hand-written-citations.py
 COPY doc2md.py /app/doc2md.py
 COPY requirements.txt /app/requirements.txt
 COPY filter /app/filter
