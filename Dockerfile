@@ -6,6 +6,10 @@ RUN apt-get update && apt-get install -y \
         git \
         && rm -rf /var/lib/apt/lists/*
 
+# Symlink 'python' executable within Ubuntu
+RUN ln -s /usr/bin/python3 /usr/bin/python & \
+    ln -s /usr/bin/pip3 /usr/bin/pip
+
 # Set the working directory
 WORKDIR /app
 
