@@ -3,7 +3,6 @@ FROM pandoc/core:3.6.4.0-ubuntu
 RUN apt-get update && apt-get install -y \
         python3 \
         python3-pip \
-        python3-panflute \
         git \
         && rm -rf /var/lib/apt/lists/*
 
