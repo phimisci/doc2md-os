@@ -9,15 +9,12 @@ RUN apt-get update && apt-get install -y \
 # Set the working directory
 WORKDIR /app
 
-# Create a directory to store the filters
-RUN mkdir /app/filter
-
 # Copy files
 COPY markdown_cleaner.py /app/markdown_cleaner.py
+COPY find_citation_candidates.py /app/find_citation_candidates.py
+COPY hand-written-citations.py /app/hand-written-citations.py
 COPY doc2md.py /app/doc2md.py
 COPY requirements.txt /app/requirements.txt
-COPY filter/find_citation_candidates.py /app/filter/find_citation_candidates.py
-COPY filter/hand-written-citations.py /app/filter/hand-written-citations.py
 
 # Create folder for file input/output
 RUN mkdir /app/files
