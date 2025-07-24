@@ -3,6 +3,7 @@ FROM pandoc/core:3.6.4.0-ubuntu
 RUN apt-get update && apt-get install -y \
         python3 \
         python3-pip \
+        python3-venv \
         git \
         && rm -rf /var/lib/apt/lists/*
 
@@ -19,7 +20,7 @@ ENV PATH="$PANENV/bin:${PATH}"
 
 # Install Python dependencies 
 COPY requirements.txt /app/
-RUN pip install -r /app/requirements.txt
+RUN /app/venv/bin/pip install -r /app/requirements.txt
 
 # Copy files
 COPY doc2md.py /app/
