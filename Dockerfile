@@ -11,13 +11,12 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Configure a VENV to use Python in
-ENV PANENV = /app/panenv
-RUN python3 -m venv $PANENV
-ENV PATH="$PANENV/bin:${PATH}"
+RUN python3 -m venv /app/panenv
+ENV PATH="/app/panenv/bin:$PATH"
 
 # Install Python dependencies 
 COPY requirements.txt /app/
-RUN pip install -r /app/requirements.txt
+RUN /app/panenv/bin/pip install -r /app/requirements.txt
 
 # Copy files
 COPY doc2md.py /app/
