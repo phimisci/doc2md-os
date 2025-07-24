@@ -7,9 +7,6 @@ RUN apt-get update && apt-get install -y \
         git \
         && rm -rf /var/lib/apt/lists/*
 
-# Symlink 'python' executable within Ubuntu
-RUN ln -s /usr/bin/python3 /usr/bin/python
-
 # Set the working directory
 WORKDIR /app
 
@@ -20,7 +17,7 @@ ENV PATH="$PANENV/bin:${PATH}"
 
 # Install Python dependencies 
 COPY requirements.txt /app/
-RUN /app/venv/bin/pip install -r /app/requirements.txt
+RUN pip install -r /app/requirements.txt
 
 # Copy files
 COPY doc2md.py /app/
@@ -31,4 +28,4 @@ COPY hand-written-citations.py /app/
 # Create folder for file input/output
 RUN mkdir /app/files
 
-ENTRYPOINT ["/app/venv/bin/python", "/app/doc2md.py"]
+ENTRYPOINT ["python", "/app/doc2md.py"]
