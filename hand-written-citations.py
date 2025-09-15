@@ -28,25 +28,38 @@ def connect_two_names(name1, name2, *, connectives=[" & ", " and "]):
     """
     return [f"{name1}{connective}{name2}" for connective in connectives]
 
+def find_name_components(name):
+    """
+    For authors that have a family name, return that family name. 
+    For other authors, such as anonymous, authors from antiquity, authors with
+    a pen name, organisations, etc., return the literal name.
+    """
+    try:
+        return name["family"]
+    except KeyError:
+        return name["literal"]
+
 def parse_json_author_names(author_input, *, and_others_string=" et al."):
     """
     Parse author data stored in a JSON object and return expected APA citation
     name.
     """
     if len(author_input) == 1:
-        try:
-            return [author_input[0]["family"]]
-        except KeyError:
-            return [author_input[0]["literal"]]
+        return [find_name_components(author_input[0])]
     
     if len(author_input) == 2:
-        return connect_two_names (
-            author_input[0]["family"], 
-            author_input[1]["family"]
-        )
+        n1 = find_name_components(author_input[0])
+        n2 = find_name_components(author_input[1])
+        
+        if n2 == "others":
+            # Catch the case "author = {Author 1 and others}", where "others"
+            # would usually be interpreted a name.
+            return [f"{n1}{and_others_string}"]
+        else:
+            return connect_two_names(n1, n2)
         
     if len(author_input) > 2:
-        return [f"{author_input[0]['family']}{and_others_string}"]
+        return [f"{find_name_components(author_input[0])}{and_others_string}"]
 
 def compose_narrative_citation(*, name, date):
     """
