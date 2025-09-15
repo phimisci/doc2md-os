@@ -30,13 +30,22 @@ def connect_two_names(name1, name2, *, connectives=[" & ", " and "]):
 
 def find_name_components(name):
     """
+    In a first step, detect "von" particles. These are stored separately from
+    the family name in the JSON.
+
     For authors that have a family name, return that family name. 
     For other authors, such as anonymous, authors from antiquity, authors with
     a pen name, organisations, etc., return the literal name.
     """
     try:
-        return name["family"]
+        von_particle = name["dropping-particle"] + " "
     except KeyError:
+        von_particle = ""
+    
+    try:
+        return von_particle + name["family"]
+    except KeyError:
+        # A literal name does not contain "von" particles.
         return name["literal"]
 
 def parse_json_author_names(author_input, *, and_others_string=" et al."):
