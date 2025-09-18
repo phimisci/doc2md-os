@@ -254,78 +254,82 @@ def filter_pandoc_objects(elem, doc):
     if isinstance(elem, pf.Para): #or type(elem) == pf.Plain:
         for d in doc.tmp_distances:
             for i in range(len(elem.content)-1, -1, -1):
-                current_element = pf.stringify(elem.content[i:i+d])
-                result = re.search(doc.tmp_searchstring, current_element)
-
-                if result:
-                    # We found something! 
-                    del elem.content[i:i+d]
-                    bib_string = result.group(2)
-
-                    if result.group(3) != "":
-                        # We insert the last group first, but only if it is
-                        # non-empty. For example, this could be a closing ).
-                        elem.content.insert(
-                            i, pf.Str(result.group(3))
+                current_element = elem.content[i:i+d]
+                if len(current_element) == d:
+                    result = re.search(
+                        doc.tmp_searchstring, pf.stringify(current_element)
                         )
 
-                    if bib_string in doc.tmp_bibliography:
-                        # The second group of our match contains the actual 
-                        # citation string. The replacement depends on the type
-                        # of citation.
+                    if result:
+                        # We found something! 
+                        del elem.content[i:i+d]
+                        bib_string = result.group(2)
 
-                        if doc.tmp_bibliography[bib_string]["type"] == "narrative":
-                            
-                            elem.content.insert(i, pf.Cite(
-                                citations=[pf.Citation(
-                                    id=doc.tmp_bibliography[bib_string]["id"],
-                                    mode="SuppressAuthor"
-                                    )]
-                                )
-                            )
-                            elem.content.insert(i, pf.Str("("))
-                            elem.content.insert(i, pf.Space())
-                            elem.content.insert(i, pf.Str(
-                                doc.tmp_bibliography[bib_string]["authors"]
-                                )
+                        if result.group(3) != "":
+                            # We insert the last group first, but only if it is
+                            # non-empty. For example, this could be a closing ).
+                            elem.content.insert(
+                                i, pf.Str(result.group(3))
                             )
 
-                        if doc.tmp_bibliography[bib_string]["type"] == "plain":
-                            
-                            elem.content.insert(i, pf.Cite(
-                                citations=[pf.Citation(
-                                    id=doc.tmp_bibliography[bib_string]["id"],
-                                    mode="NormalCitation"
-                                    )]
-                                )
-                            )
+                        if bib_string in doc.tmp_bibliography:
+                            # The second group of our match contains the actual 
+                            # citation string. The replacement depends on the 
+                            # type of citation.
 
-                        if doc.tmp_bibliography[bib_string]["type"] == "possessive":
-                            
-                            elem.content.insert(i, pf.Str(")"))
-                            elem.content.insert(i, pf.Cite(
-                                citations=[pf.Citation(
-                                    id=doc.tmp_bibliography[bib_string]["id"],
-                                    mode="SuppressAuthor"
-                                    )]
+                            if doc.tmp_bibliography[bib_string]["type"] == "narrative":
+                                
+                                elem.content.insert(i, pf.Cite(
+                                    citations=[pf.Citation(
+                                        id=doc.tmp_bibliography[bib_string]["id"],
+                                        mode="SuppressAuthor"
+                                        )]
+                                    )
                                 )
-                            )
-                            elem.content.insert(i, pf.Str(
-                                doc.tmp_bibliography[bib_string]["authors"] + "(")
-                            )
-                    else:
-                        # This should never happen. A serious malfunction.
-                        raise IndexError(
-                            f"Bibliography entry {bib_string} missing."
-                            )
+                                elem.content.insert(i, pf.Str("("))
+                                elem.content.insert(i, pf.Space())
+                                elem.content.insert(i, pf.Str(
+                                    doc.tmp_bibliography[bib_string]["authors"]
+                                    )
+                                )
 
-                    if result.group(1) != "":
-                        # The first group of our match is input last, in line
-                        # with our backwards processing. It usually contains a
-                        # (, but is often empty (in which case nothing is done).
-                        elem.content.insert(
-                            i, pf.Str(result.group(1))
-                        )
+                            if doc.tmp_bibliography[bib_string]["type"] == "plain":
+                                
+                                elem.content.insert(i, pf.Cite(
+                                    citations=[pf.Citation(
+                                        id=doc.tmp_bibliography[bib_string]["id"],
+                                        mode="NormalCitation"
+                                        )]
+                                    )
+                                )
+
+                            if doc.tmp_bibliography[bib_string]["type"] == "possessive":
+                                
+                                elem.content.insert(i, pf.Str(")"))
+                                elem.content.insert(i, pf.Cite(
+                                    citations=[pf.Citation(
+                                        id=doc.tmp_bibliography[bib_string]["id"],
+                                        mode="SuppressAuthor"
+                                        )]
+                                    )
+                                )
+                                elem.content.insert(i, pf.Str(
+                                    doc.tmp_bibliography[bib_string]["authors"] + "(")
+                                )
+                        else:
+                            # This should never happen. A serious malfunction.
+                            raise IndexError(
+                                f"Bibliography entry {bib_string} missing."
+                                )
+
+                        if result.group(1) != "":
+                            # The first group of our match is input last, in 
+                            # line with our backwards processing. It usually 
+                            # contains a (, but is often empty (in which case 
+                            # nothing is done).
+                            elem.content.insert(
+                                i, pf.Str(result.group(1))
+                            )
         return 
 
 def preprocess_bibliography(doc):
