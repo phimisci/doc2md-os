@@ -1,0 +1,5 @@
+Tutorial
+========
+
+.. toctree::
+   readme

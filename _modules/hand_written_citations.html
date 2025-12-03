@@ -1,0 +1,529 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hand_written_citations &mdash; DOC2MD 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            DOC2MD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DOC2MD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">hand_written_citations</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hand_written_citations</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A pandoc filter to detect hand-coded citations based on a supplied bibliography</span>
+<span class="sd">database.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">panflute</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pf</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<div class="viewcode-block" id="parse_input_bibliography">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.parse_input_bibliography">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_input_bibliography</span><span class="p">(</span><span class="n">bibliography_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Obtain the JSON representation of a bibliography database stored in </span>
+<span class="sd">    `bibliography_file`.</span>
+
+<span class="sd">    This function uses the `subprocess` library to call `pandoc`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;pandoc&quot;</span><span class="p">,</span> <span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;csljson&quot;</span><span class="p">,</span> <span class="n">bibliography_file</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="connect_two_names">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.connect_two_names">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">connect_two_names</span><span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">name2</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">connectives</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot; &amp; &quot;</span><span class="p">,</span> <span class="s2">&quot; and &quot;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the strings that could possibly occur given two input names and some</span>
+<span class="sd">    `connectives`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name1</span><span class="si">}{</span><span class="n">connective</span><span class="si">}{</span><span class="n">name2</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">connective</span> <span class="ow">in</span> <span class="n">connectives</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="find_name_components">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.find_name_components">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_name_components</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In a first step, detect &quot;von&quot; particles. These are stored separately from</span>
+<span class="sd">    the family name in the JSON.</span>
+
+<span class="sd">    For authors that have a family name, return that family name. </span>
+<span class="sd">    For other authors, such as anonymous, authors from antiquity, authors with</span>
+<span class="sd">    a pen name, organisations, etc., return the literal name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">von_particle</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="s2">&quot;dropping-particle&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">von_particle</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">von_particle</span> <span class="o">+</span> <span class="n">name</span><span class="p">[</span><span class="s2">&quot;family&quot;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="c1"># A literal name does not contain &quot;von&quot; particles.</span>
+        <span class="k">return</span> <span class="n">name</span><span class="p">[</span><span class="s2">&quot;literal&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="parse_json_author_names">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.parse_json_author_names">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_json_author_names</span><span class="p">(</span><span class="n">author_input</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">and_others_string</span><span class="o">=</span><span class="s2">&quot; et al.&quot;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse author data stored in a JSON object and return expected APA citation</span>
+<span class="sd">    name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">author_input</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">find_name_components</span><span class="p">(</span><span class="n">author_input</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span>
+    
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">author_input</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">n1</span> <span class="o">=</span> <span class="n">find_name_components</span><span class="p">(</span><span class="n">author_input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">n2</span> <span class="o">=</span> <span class="n">find_name_components</span><span class="p">(</span><span class="n">author_input</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="k">if</span> <span class="n">n2</span> <span class="o">==</span> <span class="s2">&quot;others&quot;</span><span class="p">:</span>
+            <span class="c1"># Catch the case &quot;author = {Author 1 and others}&quot;, where &quot;others&quot;</span>
+            <span class="c1"># would usually be interpreted a name.</span>
+            <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">n1</span><span class="si">}{</span><span class="n">and_others_string</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">connect_two_names</span><span class="p">(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">)</span>
+        
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">author_input</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">find_name_components</span><span class="p">(</span><span class="n">author_input</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}{</span><span class="n">and_others_string</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="compose_narrative_citation">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.compose_narrative_citation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compose_narrative_citation</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In a narrative or “in-text” citation, the `name` is followed by the </span>
+<span class="sd">    publication year in parentheses.</span>
+
+<span class="sd">    Example: Name (Year)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="compose_plain_citation">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.compose_plain_citation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compose_plain_citation</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">connectives</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    In a plain citation, the date follows the name(s) separated by any of the</span>
+<span class="sd">    `connectives`. As far as this filter is concerned, parenthetical citations</span>
+<span class="sd">    are plain citations surrounded by parentheses.</span>
+
+<span class="sd">    Examples: (Name, Year); Name Year; Name, Year</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">connective</span><span class="si">}{</span><span class="n">date</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">connective</span> <span class="ow">in</span> <span class="n">connectives</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="compose_parenthetical_citation">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.compose_parenthetical_citation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compose_parenthetical_citation</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">connectives</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Placeholder function that might be useful in the future but is not used now.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">connective</span><span class="si">}{</span><span class="n">date</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="k">for</span> <span class="n">connective</span> <span class="ow">in</span> <span class="n">connectives</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="compose_possessive_citation">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.compose_possessive_citation">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compose_possessive_citation</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> 
+                                <span class="n">connectives</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;&#39; &quot;</span><span class="p">,</span> <span class="s2">&quot;&#39;s &quot;</span><span class="p">,</span> <span class="s2">&quot;’s &quot;</span><span class="p">]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Possessive citations add a genitive -s to `name` and parentheses around</span>
+<span class="sd">    `year`.</span>
+
+<span class="sd">    In contrast to the other composition function, possessive citations return</span>
+<span class="sd">    a list of dictionaries instead of a list of strings. This is because the </span>
+<span class="sd">    returned `citestring` needs to be replaced in the document, but the author</span>
+<span class="sd">    names(s) need to be printed like `authors`. See the details of</span>
+<span class="sd">    `parse_author_names()` below.</span>
+
+<span class="sd">    Examples: Name&#39;s (Year); Name&#39; (Year); Name’s (Year)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[{</span><span class="s2">&quot;citestring&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">connective</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">date</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+             <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}{</span><span class="n">connective</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span> <span class="k">for</span> <span class="n">connective</span> <span class="ow">in</span> <span class="n">connectives</span><span class="p">]</span></div>
+
+    
+<div class="viewcode-block" id="parse_author_names">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.parse_author_names">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_author_names</span><span class="p">(</span><span class="n">bibliography_file</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build and return a mapping ...</span>
+<span class="sd">      - from: the citation strings we expect to appear in the document based on </span>
+<span class="sd">              the supplied bibliography.</span>
+<span class="sd">      - to:   the citation keys in the bibliography.</span>
+
+<span class="sd">    Example: {&quot;Wiese &amp; Fink, 2020&quot;: &quot;wiese_fink_2020&quot;}, where “Wiese &amp; Fink, </span>
+<span class="sd">             2020” is a string typed manually in the submission and </span>
+<span class="sd">             `wiese_fink_2020` is a citation key stored in the submitted </span>
+<span class="sd">             bibliography database.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">parse_input_bibliography</span><span class="p">(</span><span class="n">bibliography_file</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">work</span> <span class="ow">in</span> <span class="n">r</span><span class="p">:</span>
+        
+        <span class="c1"># We first check whether a work is identified by its author or editor</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">author_or_editor</span> <span class="o">=</span> <span class="n">work</span><span class="p">[</span><span class="s2">&quot;author&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">author_or_editor</span> <span class="o">=</span> <span class="n">work</span><span class="p">[</span><span class="s2">&quot;editor&quot;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+        <span class="c1"># Next, we check whether the entry has a publication year or a </span>
+        <span class="c1"># publication state.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">publication_date_or_status</span> <span class="o">=</span> <span class="n">work</span><span class="p">[</span><span class="s2">&quot;issued&quot;</span><span class="p">][</span><span class="s2">&quot;date-parts&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="c1"># Expected errors: KeyError, IndexError (depending on supplied info)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">publication_date_or_status</span> <span class="o">=</span> <span class="n">work</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="c1"># The entry does not even have a date or state field. In this </span>
+                <span class="c1"># case, assume the string contains “forthcoming”</span>
+                <span class="n">publication_date_or_status</span> <span class="o">=</span> <span class="s2">&quot;forthcoming&quot;</span>
+
+        
+        <span class="k">if</span> <span class="n">author_or_editor</span><span class="p">:</span>
+            <span class="c1"># We skip entries that have neither author nor editor</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">parse_json_author_names</span><span class="p">(</span><span class="n">author_or_editor</span><span class="p">):</span>
+                
+                <span class="c1"># Add all expected narrative citations.</span>
+                <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">compose_narrative_citation</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">publication_date_or_status</span>
+                <span class="p">):</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">string</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">work</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> 
+                                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;narrative&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="n">name</span>
+                                <span class="p">}</span> 
+
+                <span class="c1"># Add all expected plain citations. </span>
+                <span class="c1"># This also covers parenthetical citations, which we treat as</span>
+                <span class="c1"># a special case of plain citations.</span>
+                <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">compose_plain_citation</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">publication_date_or_status</span>
+                <span class="p">):</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">string</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">work</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> 
+                                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;plain&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="n">name</span>
+                                <span class="p">}</span> 
+                    
+                <span class="c1"># Add all expected possessive citations.</span>
+                <span class="c1"># Treatment here is a bit different so we can properly print</span>
+                <span class="c1"># the possessive markers like “&#39;s”</span>
+                <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">compose_possessive_citation</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">date</span><span class="o">=</span><span class="n">publication_date_or_status</span>
+                <span class="p">):</span>
+                    <span class="n">d</span><span class="p">[</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;citestring&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">work</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                                               <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;possessive&quot;</span><span class="p">,</span>
+                                               <span class="s2">&quot;authors&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;authors&quot;</span><span class="p">]</span>
+                                              <span class="p">}</span> 
+
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="compose_regex_search_string">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.compose_regex_search_string">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">compose_regex_search_string</span><span class="p">(</span><span class="n">input_iterable</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    From a dictionary, compose a RegEx search string that matches either of</span>
+<span class="sd">    the dictionary&#39;s keys. In reality, this will be a quite long expression</span>
+<span class="sd">    consisting of all the possible citation strings that we can expect to be </span>
+<span class="sd">    typed in a document.</span>
+
+<span class="sd">    First we escape all regex metacharacters in the input dictionary (re.escape).</span>
+<span class="sd">    We then build a string separating each key from the iterable, separating </span>
+<span class="sd">    each entry by a logical or (|).</span>
+
+<span class="sd">    Next, we compile a regex pattern. The expected citation string...</span>
+<span class="sd">      - can be preceeded by: (</span>
+<span class="sd">      - can be followed by: ; , . or )</span>
+<span class="sd">      - is delimited by ^ and $ to protect against over-matching.</span>
+
+<span class="sd">    If a match is found, the pattern will return three groups:</span>
+<span class="sd">      - \1: If present, a ( preceeding the citation string </span>
+<span class="sd">            (in parenthetical citations)</span>
+<span class="sd">      - \2: The citation string</span>
+<span class="sd">      - \3: The post-citation elements like a semicolon or comma.</span>
+
+<span class="sd">    \1 and \3 can be empty groups.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">,</span> <span class="n">input_iterable</span><span class="p">))</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^([\(]*)&quot;</span><span class="o">+</span><span class="s2">&quot;(&quot;</span><span class="o">+</span><span class="n">names</span><span class="o">+</span><span class="s2">&quot;)&quot;</span><span class="o">+</span><span class="s2">&quot;([;,</span><span class="se">\\</span><span class="s2">.</span><span class="se">\\</span><span class="s2">)]*)$&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pattern</span></div>
+
+
+<div class="viewcode-block" id="determine_unique_length_of_bib_strings">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.determine_unique_length_of_bib_strings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">determine_unique_length_of_bib_strings</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    There is a danger of short-circuiting our search. For example, if both </span>
+<span class="sd">    “Wiese 2020” and “Fink &amp; Wiese 2020” are present in the bibliography, </span>
+<span class="sd">    looking for “Wiese 2020” before “Fink &amp; Wiese 2020” could lead to wrong</span>
+<span class="sd">    citations.</span>
+
+<span class="sd">    Our solution is to look for the longest citation strings first, and work</span>
+<span class="sd">    down from this. Later in the filter, we iterate over the possible lenghts</span>
+<span class="sd">    of citation strings in *descending* order (`reverse=True`).</span>
+
+<span class="sd">    If an entry has n words separated by spaces, it has 2n-1 elements in total.</span>
+
+<span class="sd">    Typical values are 3 and 7:</span>
+<span class="sd">     - “Wiese 2020“ has three components (Wiese, Space, and 2020)</span>
+<span class="sd">     - “Wiese &amp; Fink 2020“ has seven components (Wiese, Space, &amp;, Space, Fink, </span>
+<span class="sd">       Space, 2020)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">sorted</span><span class="p">({</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">d</span><span class="p">},</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="filter_pandoc_objects">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.filter_pandoc_objects">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_pandoc_objects</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">doc</span><span class="p">):</span> 
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The actual filter function. We parse the document iteratively from the last</span>
+<span class="sd">    to the first element. Parsing backwards allows us to do in-place operations.</span>
+<span class="sd">    The in-place operations we perform a deletion of a matched manually typed</span>
+<span class="sd">    citation and appropriate replacement by a pandoc Citation object.</span>
+
+<span class="sd">    We parse the document n times, where n is the unique length of expected </span>
+<span class="sd">    citation strings. Usually, the document is parsed for lengths 7 and then 3</span>
+<span class="sd">    (see `determine_unique_length_of_bib_strings()`).</span>
+
+<span class="sd">    As we traverse the tree backwards, new elements are also inserted last-to-</span>
+<span class="sd">    first.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Para</span><span class="p">):</span> <span class="c1">#or type(elem) == pf.Plain:</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">tmp_distances</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">current_element</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">d</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_element</span><span class="p">)</span> <span class="o">==</span> <span class="n">d</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+                        <span class="n">doc</span><span class="o">.</span><span class="n">tmp_searchstring</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">stringify</span><span class="p">(</span><span class="n">current_element</span><span class="p">)</span>
+                        <span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+                        <span class="c1"># We found something! </span>
+                        <span class="k">del</span> <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">d</span><span class="p">]</span>
+                        <span class="n">bib_string</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                            <span class="c1"># We insert the last group first, but only if it is</span>
+                            <span class="c1"># non-empty. For example, this could be a closing ).</span>
+                            <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
+                                <span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Str</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+                            <span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">bib_string</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span><span class="p">:</span>
+                            <span class="c1"># The second group of our match contains the actual </span>
+                            <span class="c1"># citation string. The replacement depends on the </span>
+                            <span class="c1"># type of citation.</span>
+
+                            <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span><span class="p">[</span><span class="n">bib_string</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;narrative&quot;</span><span class="p">:</span>
+                                
+                                <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Cite</span><span class="p">(</span>
+                                    <span class="n">citations</span><span class="o">=</span><span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">Citation</span><span class="p">(</span>
+                                        <span class="nb">id</span><span class="o">=</span><span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span><span class="p">[</span><span class="n">bib_string</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                                        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;SuppressAuthor&quot;</span>
+                                        <span class="p">)]</span>
+                                    <span class="p">)</span>
+                                <span class="p">)</span>
+                                <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Str</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">))</span>
+                                <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Space</span><span class="p">())</span>
+                                <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Str</span><span class="p">(</span>
+                                    <span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span><span class="p">[</span><span class="n">bib_string</span><span class="p">][</span><span class="s2">&quot;authors&quot;</span><span class="p">]</span>
+                                    <span class="p">)</span>
+                                <span class="p">)</span>
+
+                            <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span><span class="p">[</span><span class="n">bib_string</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;plain&quot;</span><span class="p">:</span>
+                                
+                                <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Cite</span><span class="p">(</span>
+                                    <span class="n">citations</span><span class="o">=</span><span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">Citation</span><span class="p">(</span>
+                                        <span class="nb">id</span><span class="o">=</span><span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span><span class="p">[</span><span class="n">bib_string</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                                        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;NormalCitation&quot;</span>
+                                        <span class="p">)]</span>
+                                    <span class="p">)</span>
+                                <span class="p">)</span>
+
+                            <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span><span class="p">[</span><span class="n">bib_string</span><span class="p">][</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;possessive&quot;</span><span class="p">:</span>
+                                
+                                <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Str</span><span class="p">(</span><span class="s2">&quot;)&quot;</span><span class="p">))</span>
+                                <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Cite</span><span class="p">(</span>
+                                    <span class="n">citations</span><span class="o">=</span><span class="p">[</span><span class="n">pf</span><span class="o">.</span><span class="n">Citation</span><span class="p">(</span>
+                                        <span class="nb">id</span><span class="o">=</span><span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span><span class="p">[</span><span class="n">bib_string</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                                        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;SuppressAuthor&quot;</span>
+                                        <span class="p">)]</span>
+                                    <span class="p">)</span>
+                                <span class="p">)</span>
+                                <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Str</span><span class="p">(</span>
+                                    <span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span><span class="p">[</span><span class="n">bib_string</span><span class="p">][</span><span class="s2">&quot;authors&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;(&quot;</span><span class="p">)</span>
+                                <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># This should never happen. A serious malfunction.</span>
+                            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Bibliography entry </span><span class="si">{</span><span class="n">bib_string</span><span class="si">}</span><span class="s2"> missing.&quot;</span>
+                                <span class="p">)</span>
+
+                        <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                            <span class="c1"># The first group of our match is input last, in </span>
+                            <span class="c1"># line with our backwards processing. It usually </span>
+                            <span class="c1"># contains a (, but is often empty (in which case </span>
+                            <span class="c1"># nothing is done).</span>
+                            <span class="n">elem</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
+                                <span class="n">i</span><span class="p">,</span> <span class="n">pf</span><span class="o">.</span><span class="n">Str</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                            <span class="p">)</span>
+        <span class="k">return</span> </div>
+
+
+<div class="viewcode-block" id="preprocess_bibliography">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.preprocess_bibliography">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">preprocess_bibliography</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Before running the filter, we prepare some data so that it is not processed</span>
+<span class="sd">    at each iteration of the fitler. Please see the documentation for the </span>
+<span class="sd">    individual functions to see which data is processed here.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">bibliography</span> <span class="o">=</span> <span class="n">parse_author_names</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">(</span><span class="s2">&quot;bibliography&quot;</span><span class="p">))</span>
+    <span class="n">distances</span> <span class="o">=</span> <span class="n">determine_unique_length_of_bib_strings</span><span class="p">(</span><span class="n">bibliography</span><span class="p">)</span>
+    <span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span> <span class="o">=</span> <span class="n">bibliography</span>
+    <span class="n">doc</span><span class="o">.</span><span class="n">tmp_distances</span> <span class="o">=</span> <span class="n">distances</span>
+    <span class="n">doc</span><span class="o">.</span><span class="n">tmp_searchstring</span> <span class="o">=</span> <span class="n">compose_regex_search_string</span><span class="p">(</span><span class="n">bibliography</span><span class="p">)</span>
+
+    <span class="c1"># We need a customised APA citation pattern, which we indicate here.</span>
+    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">format</span> <span class="o">==</span> <span class="s2">&quot;html&quot;</span><span class="p">:</span>
+        <span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;csl&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;./csl/apa7-manual-parentheses.csl&quot;</span>
+    
+    <span class="c1"># We also need to direct LaTeX \autocite and \autocite* to *not* output</span>
+    <span class="c1"># parentheses.</span>
+    <span class="k">if</span> <span class="n">doc</span><span class="o">.</span><span class="n">format</span> <span class="o">==</span> <span class="s2">&quot;latex&quot;</span><span class="p">:</span>
+        <span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;biblatex&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+        <span class="n">doc</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;biblatexoptions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;autocite=plain, style=apa&quot;</span><span class="p">]</span>
+    
+    <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="cleanup">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.cleanup">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="n">doc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    We&#39;re not exactly sure whether this is necessary, but before writing the</span>
+<span class="sd">    document, we clean up the temporary objects we have created in the pandoc</span>
+<span class="sd">    document.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">del</span> <span class="n">doc</span><span class="o">.</span><span class="n">tmp_bibliography</span>
+    <span class="k">del</span> <span class="n">doc</span><span class="o">.</span><span class="n">tmp_distances</span>
+    <span class="k">del</span> <span class="n">doc</span><span class="o">.</span><span class="n">tmp_searchstring</span>
+    <span class="k">return</span> </div>
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../generated/hand_written_citations.html#hand_written_citations.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">doc</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function merely initialises the filter.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">pf</span><span class="o">.</span><span class="n">run_filter</span><span class="p">(</span>
+        <span class="n">filter_pandoc_objects</span><span class="p">,</span> 
+        <span class="n">doc</span><span class="o">=</span><span class="n">doc</span><span class="p">,</span>
+        <span class="n">prepare</span><span class="o">=</span><span class="n">preprocess_bibliography</span><span class="p">,</span>
+        <span class="n">finalize</span><span class="o">=</span><span class="n">cleanup</span>
+        <span class="p">)</span> </div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas Jurczyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
