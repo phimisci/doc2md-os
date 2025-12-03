@@ -1,0 +1,360 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hand_written_citations &mdash; DOC2MD 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="find_citation_candidates" href="find_citation_candidates.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            DOC2MD
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="doc2md.html">doc2md</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown_cleaner.html">markdown_cleaner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="find_citation_candidates.html">find_citation_candidates</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">hand_written_citations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.parse_input_bibliography"><code class="docutils literal notranslate"><span class="pre">parse_input_bibliography()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.connect_two_names"><code class="docutils literal notranslate"><span class="pre">connect_two_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.find_name_components"><code class="docutils literal notranslate"><span class="pre">find_name_components()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.parse_json_author_names"><code class="docutils literal notranslate"><span class="pre">parse_json_author_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.compose_narrative_citation"><code class="docutils literal notranslate"><span class="pre">compose_narrative_citation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.compose_plain_citation"><code class="docutils literal notranslate"><span class="pre">compose_plain_citation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.compose_parenthetical_citation"><code class="docutils literal notranslate"><span class="pre">compose_parenthetical_citation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.compose_possessive_citation"><code class="docutils literal notranslate"><span class="pre">compose_possessive_citation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.parse_author_names"><code class="docutils literal notranslate"><span class="pre">parse_author_names()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.compose_regex_search_string"><code class="docutils literal notranslate"><span class="pre">compose_regex_search_string()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.determine_unique_length_of_bib_strings"><code class="docutils literal notranslate"><span class="pre">determine_unique_length_of_bib_strings()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.filter_pandoc_objects"><code class="docutils literal notranslate"><span class="pre">filter_pandoc_objects()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.preprocess_bibliography"><code class="docutils literal notranslate"><span class="pre">preprocess_bibliography()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.cleanup"><code class="docutils literal notranslate"><span class="pre">cleanup()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hand_written_citations.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DOC2MD</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API</a></li>
+      <li class="breadcrumb-item active">hand_written_citations</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/generated/hand_written_citations.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-hand_written_citations">
+<span id="hand-written-citations"></span><h1>hand_written_citations<a class="headerlink" href="#module-hand_written_citations" title="Link to this heading"></a></h1>
+<p>A pandoc filter to detect hand-coded citations based on a supplied bibliography
+database.</p>
+<p class="rubric">Functions</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hand_written_citations.cleanup" title="hand_written_citations.cleanup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cleanup</span></code></a>(doc)</p></td>
+<td><p>We're not exactly sure whether this is necessary, but before writing the document, we clean up the temporary objects we have created in the pandoc document.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hand_written_citations.compose_narrative_citation" title="hand_written_citations.compose_narrative_citation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose_narrative_citation</span></code></a>(*, name, date)</p></td>
+<td><p>In a narrative or “in-text” citation, the <cite>name</cite> is followed by the publication year in parentheses.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hand_written_citations.compose_parenthetical_citation" title="hand_written_citations.compose_parenthetical_citation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose_parenthetical_citation</span></code></a>(*, name, date)</p></td>
+<td><p>Placeholder function that might be useful in the future but is not used now.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hand_written_citations.compose_plain_citation" title="hand_written_citations.compose_plain_citation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose_plain_citation</span></code></a>(*, name, date[, ...])</p></td>
+<td><p>In a plain citation, the date follows the name(s) separated by any of the <cite>connectives</cite>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hand_written_citations.compose_possessive_citation" title="hand_written_citations.compose_possessive_citation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose_possessive_citation</span></code></a>(*, name, date[, ...])</p></td>
+<td><p>Possessive citations add a genitive -s to <cite>name</cite> and parentheses around <cite>year</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hand_written_citations.compose_regex_search_string" title="hand_written_citations.compose_regex_search_string"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compose_regex_search_string</span></code></a>(input_iterable)</p></td>
+<td><p>From a dictionary, compose a RegEx search string that matches either of the dictionary's keys.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hand_written_citations.connect_two_names" title="hand_written_citations.connect_two_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">connect_two_names</span></code></a>(name1, name2, *[, connectives])</p></td>
+<td><p>Return the strings that could possibly occur given two input names and some <cite>connectives</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hand_written_citations.determine_unique_length_of_bib_strings" title="hand_written_citations.determine_unique_length_of_bib_strings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">determine_unique_length_of_bib_strings</span></code></a>(d)</p></td>
+<td><p>There is a danger of short-circuiting our search.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hand_written_citations.filter_pandoc_objects" title="hand_written_citations.filter_pandoc_objects"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filter_pandoc_objects</span></code></a>(elem, doc)</p></td>
+<td><p>The actual filter function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hand_written_citations.find_name_components" title="hand_written_citations.find_name_components"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_name_components</span></code></a>(name)</p></td>
+<td><p>In a first step, detect &quot;von&quot; particles.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hand_written_citations.main" title="hand_written_citations.main"><code class="xref py py-obj docutils literal notranslate"><span class="pre">main</span></code></a>([doc])</p></td>
+<td><p>This function merely initialises the filter.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hand_written_citations.parse_author_names" title="hand_written_citations.parse_author_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_author_names</span></code></a>(bibliography_file)</p></td>
+<td><p>Build and return a mapping ...</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hand_written_citations.parse_input_bibliography" title="hand_written_citations.parse_input_bibliography"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_input_bibliography</span></code></a>(bibliography_file)</p></td>
+<td><p>Obtain the JSON representation of a bibliography database stored in <cite>bibliography_file</cite>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#hand_written_citations.parse_json_author_names" title="hand_written_citations.parse_json_author_names"><code class="xref py py-obj docutils literal notranslate"><span class="pre">parse_json_author_names</span></code></a>(author_input, *[, ...])</p></td>
+<td><p>Parse author data stored in a JSON object and return expected APA citation name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#hand_written_citations.preprocess_bibliography" title="hand_written_citations.preprocess_bibliography"><code class="xref py py-obj docutils literal notranslate"><span class="pre">preprocess_bibliography</span></code></a>(doc)</p></td>
+<td><p>Before running the filter, we prepare some data so that it is not processed at each iteration of the fitler.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.parse_input_bibliography">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">parse_input_bibliography</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bibliography_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#parse_input_bibliography"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.parse_input_bibliography" title="Link to this definition"></a></dt>
+<dd><p>Obtain the JSON representation of a bibliography database stored in
+<cite>bibliography_file</cite>.</p>
+<p>This function uses the <cite>subprocess</cite> library to call <cite>pandoc</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.connect_two_names">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">connect_two_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name2</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['</span> <span class="pre">&amp;</span> <span class="pre">',</span> <span class="pre">'</span> <span class="pre">and</span> <span class="pre">']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#connect_two_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.connect_two_names" title="Link to this definition"></a></dt>
+<dd><p>Return the strings that could possibly occur given two input names and some
+<cite>connectives</cite>.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.find_name_components">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">find_name_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#find_name_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.find_name_components" title="Link to this definition"></a></dt>
+<dd><p>In a first step, detect “von” particles. These are stored separately from
+the family name in the JSON.</p>
+<p>For authors that have a family name, return that family name.
+For other authors, such as anonymous, authors from antiquity, authors with
+a pen name, organisations, etc., return the literal name.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.parse_json_author_names">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">parse_json_author_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">author_input</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">and_others_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'</span> <span class="pre">et</span> <span class="pre">al.'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#parse_json_author_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.parse_json_author_names" title="Link to this definition"></a></dt>
+<dd><p>Parse author data stored in a JSON object and return expected APA citation
+name.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.compose_narrative_citation">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">compose_narrative_citation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#compose_narrative_citation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.compose_narrative_citation" title="Link to this definition"></a></dt>
+<dd><p>In a narrative or “in-text” citation, the <cite>name</cite> is followed by the
+publication year in parentheses.</p>
+<p>Example: Name (Year)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.compose_plain_citation">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">compose_plain_citation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['</span> <span class="pre">',</span> <span class="pre">',</span> <span class="pre">']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#compose_plain_citation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.compose_plain_citation" title="Link to this definition"></a></dt>
+<dd><p>In a plain citation, the date follows the name(s) separated by any of the
+<cite>connectives</cite>. As far as this filter is concerned, parenthetical citations
+are plain citations surrounded by parentheses.</p>
+<p>Examples: (Name, Year); Name Year; Name, Year</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.compose_parenthetical_citation">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">compose_parenthetical_citation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['</span> <span class="pre">',</span> <span class="pre">',</span> <span class="pre">']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#compose_parenthetical_citation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.compose_parenthetical_citation" title="Link to this definition"></a></dt>
+<dd><p>Placeholder function that might be useful in the future but is not used now.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.compose_possessive_citation">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">compose_possessive_citation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connectives</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[&quot;'</span> <span class="pre">&quot;,</span> <span class="pre">&quot;'s</span> <span class="pre">&quot;,</span> <span class="pre">'’s</span> <span class="pre">']</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#compose_possessive_citation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.compose_possessive_citation" title="Link to this definition"></a></dt>
+<dd><p>Possessive citations add a genitive -s to <cite>name</cite> and parentheses around
+<cite>year</cite>.</p>
+<p>In contrast to the other composition function, possessive citations return
+a list of dictionaries instead of a list of strings. This is because the
+returned <cite>citestring</cite> needs to be replaced in the document, but the author
+names(s) need to be printed like <cite>authors</cite>. See the details of
+<cite>parse_author_names()</cite> below.</p>
+<p>Examples: Name’s (Year); Name’ (Year); Name’s (Year)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.parse_author_names">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">parse_author_names</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bibliography_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#parse_author_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.parse_author_names" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Build and return a mapping …</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>from: the citation strings we expect to appear in the document based on</dt><dd><p>the supplied bibliography.</p>
+</dd>
+</dl>
+</li>
+<li><p>to:   the citation keys in the bibliography.</p></li>
+</ul>
+</dd>
+<dt>Example: {“Wiese &amp; Fink, 2020”: “wiese_fink_2020”}, where “Wiese &amp; Fink,</dt><dd><p>2020” is a string typed manually in the submission and
+<cite>wiese_fink_2020</cite> is a citation key stored in the submitted
+bibliography database.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.compose_regex_search_string">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">compose_regex_search_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_iterable</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#compose_regex_search_string"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.compose_regex_search_string" title="Link to this definition"></a></dt>
+<dd><p>From a dictionary, compose a RegEx search string that matches either of
+the dictionary’s keys. In reality, this will be a quite long expression
+consisting of all the possible citation strings that we can expect to be
+typed in a document.</p>
+<p>First we escape all regex metacharacters in the input dictionary (re.escape).
+We then build a string separating each key from the iterable, separating
+each entry by a logical or (|).</p>
+<dl class="simple">
+<dt>Next, we compile a regex pattern. The expected citation string…</dt><dd><ul class="simple">
+<li><p>can be preceeded by: (</p></li>
+<li><p>can be followed by: ; , . or )</p></li>
+<li><p>is delimited by ^ and $ to protect against over-matching.</p></li>
+</ul>
+</dd>
+<dt>If a match is found, the pattern will return three groups:</dt><dd><ul class="simple">
+<li><dl class="simple">
+<dt>: If present, a ( preceeding the citation string</dt><dd><p>(in parenthetical citations)</p>
+</dd>
+</dl>
+</li>
+<li><p>: The citation string</p></li>
+<li><p>: The post-citation elements like a semicolon or comma.</p></li>
+</ul>
+</dd>
+</dl>
+<p> and  can be empty groups.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.determine_unique_length_of_bib_strings">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">determine_unique_length_of_bib_strings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#determine_unique_length_of_bib_strings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.determine_unique_length_of_bib_strings" title="Link to this definition"></a></dt>
+<dd><p>There is a danger of short-circuiting our search. For example, if both
+“Wiese 2020” and “Fink &amp; Wiese 2020” are present in the bibliography,
+looking for “Wiese 2020” before “Fink &amp; Wiese 2020” could lead to wrong
+citations.</p>
+<p>Our solution is to look for the longest citation strings first, and work
+down from this. Later in the filter, we iterate over the possible lenghts
+of citation strings in <em>descending</em> order (<cite>reverse=True</cite>).</p>
+<p>If an entry has n words separated by spaces, it has 2n-1 elements in total.</p>
+<dl class="simple">
+<dt>Typical values are 3 and 7:</dt><dd><ul class="simple">
+<li><p>“Wiese 2020“ has three components (Wiese, Space, and 2020)</p></li>
+<li><p>“Wiese &amp; Fink 2020“ has seven components (Wiese, Space, &amp;, Space, Fink,
+Space, 2020)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.filter_pandoc_objects">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">filter_pandoc_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elem</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#filter_pandoc_objects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.filter_pandoc_objects" title="Link to this definition"></a></dt>
+<dd><p>The actual filter function. We parse the document iteratively from the last
+to the first element. Parsing backwards allows us to do in-place operations.
+The in-place operations we perform a deletion of a matched manually typed
+citation and appropriate replacement by a pandoc Citation object.</p>
+<p>We parse the document n times, where n is the unique length of expected
+citation strings. Usually, the document is parsed for lengths 7 and then 3
+(see <cite>determine_unique_length_of_bib_strings()</cite>).</p>
+<p>As we traverse the tree backwards, new elements are also inserted last-to-
+first.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.preprocess_bibliography">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">preprocess_bibliography</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#preprocess_bibliography"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.preprocess_bibliography" title="Link to this definition"></a></dt>
+<dd><p>Before running the filter, we prepare some data so that it is not processed
+at each iteration of the fitler. Please see the documentation for the
+individual functions to see which data is processed here.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.cleanup">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">cleanup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#cleanup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.cleanup" title="Link to this definition"></a></dt>
+<dd><p>We’re not exactly sure whether this is necessary, but before writing the
+document, we clean up the temporary objects we have created in the pandoc
+document.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hand_written_citations.main">
+<span class="sig-prename descclassname"><span class="pre">hand_written_citations.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">doc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hand_written_citations.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hand_written_citations.main" title="Link to this definition"></a></dt>
+<dd><p>This function merely initialises the filter.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="find_citation_candidates.html" class="btn btn-neutral float-left" title="find_citation_candidates" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Thomas Jurczyk.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
