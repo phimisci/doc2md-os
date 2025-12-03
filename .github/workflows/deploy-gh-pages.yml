@@ -25,10 +25,9 @@ jobs:
         run: |
           cd docs
           make html
-          cp -r build/html/* .
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.PHIMISCI_DOC2MD_OS_TOKEN }}
-          publish_dir: docs/_build/html
+          publish_dir: docs/build/html
