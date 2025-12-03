@@ -25,6 +25,7 @@ jobs:
         run: |
           cd docs
           make html
+          cp -r build/html/* .
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
