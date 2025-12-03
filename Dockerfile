@@ -22,7 +22,7 @@ RUN /app/panenv/bin/pip install -r /app/requirements.txt
 COPY doc2md.py /app/
 COPY markdown_cleaner.py /app/
 COPY find_citation_candidates.py /app/
-COPY hand-written-citations.py /app/
+COPY hand_written_citations.py /app/
 
 # Create folder for file input/output
 RUN mkdir /app/files
