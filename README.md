@@ -29,6 +29,17 @@ If you want to convert a DOCX file to Markdown and you have included citations i
 
 `docker run --rm --volume "$(pwd):/app/files" doc2md --zotero <FILENAME>.docx`
 
+### Automatically generated bibliography from a BibTeX file
+If you want to automatically generate citeproc citations in a document containing plain APA citations, such as Meyer 2020 or Meyer (2020), you can use the `--autobib` option. This option requires a path to a BibTeX file.
+
+`docker run --rm --volume "$(pwd):/app/files" doc2md --autobib <FILENAME>.bib <FILENAME>.<docx|odt>`
+
+The `--autobib` option uses a two-filter process to convert hand-written citations into formal pandoc citations:
+
+1.  The first filter (`hand-written-citations.py`) parses the provided BibTeX file and tries to find hand-written citations in the document (e.g., `Author (2023)`, `(Author, 2023)`, etc.) and replaces them with proper pandoc citation markers using BibTeX IDs.
+
+2.  The second filter (`find_citation_candidates.py`) runs after the first one and searches for any remaining citation-like patterns (e.g., a 4-digit year) that might have been missed. The list of these candidates is saved in `files/citation_candidates.txt` for your review. This file will only be created if there are any candidates found.
+
 ## About
 The tool was developed by Thomas Jurczyk for [Philosophy and the Mind Sciences](https://philosophymindscience.org/) to support the typesetting of articles in the journal. The tool is open-source and licensed under the MIT license. The source code is available on [GitHub](https://github.com/phimisci/doc2md-os).
 
